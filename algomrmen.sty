@@ -1,0 +1,169 @@
+\NeedsTeXFormat{LaTeX2e} 
+\ProvidesPackage{mrmenAlgo}[2011/01/24 Mon méta-paquet]
+
+
+\usepackage{ifthen}
+\usepackage{xstring}
+\usepackage{fancybox}
+\usepackage{calc}
+
+
+%%% Défintion de l'env
+%--------------------------
+\newboolean{algo} \setboolean{algo}{false}
+%--------------------------
+\newlength\algoindent \setlength\algoindent{0cm}
+%--------------------------
+\newcounter{nbalgo} \setcounter{nbalgo}{1}
+%--------------------------
+\newcounter{ligne} %numéroatations des lignes
+\setcounter{ligne}{1}
+%--------------------------
+\newcounter{deepboucle}
+\setcounter{deepboucle}{0}
+%--------------------------
+\newboolean{@boucle} \setboolean{@boucle}{false}
+%--------------------------
+\newboolean{@isnumbered}
+\setboolean{@isnumbered}{false}
+%%
+%% ajouter une condition (option paquet)
+%% pour numéroter ou non les algos
+%%
+
+
+
+
+\def\numeroligne{%
+  \raisebox{0.1ex}{%
+    \tiny\arabic{ligne}}%
+  \stepcounter{ligne}}
+
+
+\def\finligne{%
+  ;\newline\numeroligne\hspace*{1em}\hspace*{\the\algoindent}}
+
+\def\finnormal{%
+  \finligne}
+
+\def\finboucle{%
+  \finligne}
+
+\def\FinAlgo{%
+  ;\newline%
+  {\bf{Fin}}}
+
+\def\Retourner{\textbf{Retouner }}
+
+\newcommand{\lafin}[1][NULL]{%
+  \IfEq{#1}{NULL}{Met des crochets}{\addtolength\algoindent{-0.5cm}%
+    \finligne
+    {\bf Fin #1}
+    \newline{\bf Fin}
+  }}
+
+
+\def\finalgo{%
+  {\bf{Fin}
+  \finstructure}
+  }
+
+
+\def\fin{\ifthenelse{
+    \boolean{@boucle}}{
+    \finboucle}{
+    \finnormal}}
+
+%%% mots de liason
+
+\def\debutstructure{
+  \addtolength\algoindent{0.5cm}%
+  \fin\hspace*{-1.5mm}%
+  \stepcounter{deepboucle}}
+
+\def\theend{}
+
+\def\finstructure{
+  \addtolength\algoindent{-0.5cm}%
+  \@ifnextchar{\theend}{\newline\bf{Fin}}{
+  	\fin}}
+  
+
+%% While
+\def\Tq#1{%
+  \setboolean{@boucle}{true}%
+  \textbf{Tant que} #1 \textbf{faire}%
+  \debutstructure%
+  }
+
+\def\FinTq{\hspace*{-0.5cm}%
+  {\bf{Fin Tant que}}%
+  \finstructure%
+  }
+
+  
+%% Si
+\def\Si#1{ 
+  \setboolean{@boucle}{true}%
+  \textbf{Si } #1 \textbf{ alors}%
+  \debutstructure%
+   }
+
+
+\def\Sinon#1{ 
+  \setboolean{@boucle}{true}%
+  \hspace*{-0.5cm}%
+  \textbf{Sinon}%
+  \fin
+   }
+
+
+\def\SinonSi#1{ 
+  \setboolean{@boucle}{true}%
+  \textbf{Sinon Si } #1 \textbf{ alors}%
+  \fin
+   }
+
+
+\def\FinSi{\hspace*{-0.5cm}%
+  {\bf{Fin Si}}%
+  \finstructure%
+  }
+
+%% For
+
+\def\PourDe#1#2#3{ 
+  \setboolean{@boucle}{true}%
+  \textbf{Pour } #1 \textbf{ de } #2 \textbf{ à } #3 \textbf{ faire}%
+  \debutstructure
+   }
+
+
+\def\FinPour{\hspace*{-0.5cm}%
+  {\bf{Fin Pour}}%
+  \finstructure%
+  }
+  % \def{\If}{{\bf{Si }}}
+  % \def{\Then}{{\bf{Alors }}}
+  % \def{\Sinon}{{\bf{Sinon }}
+
+\def\numberalgo{
+  \@ifundefined{chapter}
+  {{\rm \arabic{section}.\arabic{subsection}}}
+  {{\rm \arabic{chapter}.\arabic{section}.\arabic{subsection}}}
+  \stepcounter{nbalgo}
+}
+
+
+\newenvironment{algo}[1][NULL]{
+  \noindent\rule{\linewidth}{0.5pt}\newline
+  \hspace*{3em}{\bf Algorithme \ifthenelse{\boolean{@isnumbered}}{\numberalgo}{}\IfEq{#1}{NULL}{}{ : #1}}\newline
+  \noindent\rule{\linewidth}{0.5pt}\newline{\bf{Début}}\newline\numeroligne\hspace*{2.5mm}}
+  {%
+  \newline\noindent\rule{\linewidth}{0.5pt}\relax
+    \setcounter{ligne}{1}}
+
+
+
+\endinput
+
